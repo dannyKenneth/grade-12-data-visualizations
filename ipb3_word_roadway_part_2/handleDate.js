@@ -1,0 +1,41 @@
+/**
+ * Sets the current date the program will show and sets important variables
+ * @return {void} Only sets global variables for future use
+ */
+function validateDate() {
+  customDate = this.value();
+  let sentiment;
+  let rawCsv = rawData.getArray();
+  let idx = extractDataFromDate(customDate, rawCsv);
+
+  //determining previous market trends to create sentiment analysis
+  if (idx !== -1) {
+    let todayPrice = float(rawCsv[idx][1]);
+    let yesterdayPrice = float(rawCsv[idx - 1][1]);
+    year = rawCsv[idx][0].substring(0, 4);
+
+    if (todayPrice >= yesterdayPrice) {
+      sentiment = climbList[floor(random(climbList.length))];
+      lastMarketTrend = "BUY";
+    } else {
+      sentiment = fallList[floor(random(fallList.length))];
+      lastMarketTrend = "SELL";
+    }
+
+    dateSlider.value(idx);
+
+    wordnik.getMarketAnalysis(sentiment);
+  }
+}
+
+/**
+ * Determuines the index needed to extract the data needed for the roadway and words based on the given date and
+ * @param {string} date The date in string notation
+ * @param {object} csv The data table csv file with all the data from the database
+ * @return {int} idx The unique index tied to the specificed date
+ */
+function extractDataFromDate(date, csv) {
+  // using an arrow function to quickly find the row with the date
+  let idx = csv.findIndex((row) => row[0] === date);
+  return idx;
+}
